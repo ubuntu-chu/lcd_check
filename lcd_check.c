@@ -1,4 +1,5 @@
 #include "lcd_check.h"
+#include "gui.h"
 #include <stdio.h>      /*标准输入输出定义*/
 #include <stdlib.h>
 #include <unistd.h>     /*Unix标准函数定义*/
@@ -17,23 +18,34 @@
 
 int main(void){
 
-	int fd, fd2;
+	LCD_Open(DEVICE_FILE_PATH);
+	GUI_Init();
+	GUI_DisplayOn();
+	GUI_SetBkColor(GUI_YELLOW);
+	GUI_Clear();
+	GUI_DrawLine(0, 0, 160, 128);
+//	GUI_DrawLine(160, 120, 60, 28);
+	GUI_DrawLine(10, 100, 10, 28);
+	//GUI_DrawLine(0, 10, 160, 10);
+	GUI_DrawLine(160, 10, 100, 10);
+	//GUI_DrawCircle(50, 50, 10);
+	GUI_FillCircle(50, 50, 10);
+	GUI_DrawArc(130, 60, 20, 30, 90);
+	GUI_DrawEllipse(110, 130, 45, 90);
+	GUI_DispStringAt("hello st7735 ----jjjjjjjHgggggHHHHH--", 0, 0);
+	GUI_DispCharAt('A', 100, 100);
+	//GUI_DrawRec(0, 0, 40, 20);
+	GUI_DrawRect(80, 80, 40, 20);
+//	GUI_FillRect(80, 110, 40, 20);
+	//GUI_ClearRect(20, 80, 40, 120);
+	//GUI_DrawBitmap(10, 10, &bmApplicationIcon);
+	//GUI_DrawBitmap(160, 10, &bmApplicationIcon);
+	//GUI_DisplayOn();
 
-	fd = open(DEVICE_FILE_PATH, O_RDONLY);
-	if (fd < 0){
-		perror("open failed\n");
-	}
-	fd2 = open(DEVICE_FILE_PATH, O_RDONLY);
-	if (fd2 < 0){
-		perror("open failed\n");
-	}
-
-	sleep(10);
 	while (1);
 
-	close(fd);
+	LCD_Close();
 
-	printf("hello st7735\n");
 
 	return 0;
 }

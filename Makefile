@@ -4,7 +4,10 @@ target := lcd_check
 cc := arm-linux-gcc
 cflag := -Wall
 
-all:$(target)
+all:head $(target)
+
+head:
+	cp /home/barnard/work/board_9G25/linux-at91/drivers/spi/st7735/st7735.h  .
 
 $(target):$(objs)
 	$(cc) $(cflag) -o $@ $^
@@ -20,6 +23,6 @@ clean:
 	rm -rf $(target) $(objs)
 
 
-.PHONY:all clean copy
+.PHONY:all clean copy head
 
 
