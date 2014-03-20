@@ -7,6 +7,9 @@
 #include <sys/ioctl.h>   /**/
 #include <fcntl.h>      /*文件控制定义*/
 #include <errno.h>      /*错误号定义*/
+#include <sys/mman.h>
+#include <assert.h>
+#include <string.h>
 
 #define  DEBUG		(0)
 
@@ -15,6 +18,7 @@ static GUI_COLOR		s_Color;
 static int				s_LcdFd = -1;
 static uint32		    s_X		= 0;
 static uint32		    s_Y		= 0;
+static char				*s_FrameBuffer = NULL;
 
 static struct lcd_info   t_lcdInfo;
 
@@ -22,12 +26,22 @@ static uint16  GUI_Color2Index_565(uint32 Color);
 
 int LCD_Open(const char *path)
 {
-	s_LcdFd = open(path, O_RDONLY);
+	s_LcdFd = open(path, O_RDWR);
 	if (s_LcdFd < 0){
 		perror("lcd device open failed\n");
 	}
+	assert(s_LcdFd >= 0);
 
 	return s_LcdFd;
+}
+
+void LCD_Mmap(void)
+{
+	s_FrameBuffer = mmap(0, t_lcdInfo.m_width*t_lcdInfo.m_height*2, PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, s_LcdFd, 0);
+	if(s_FrameBuffer == MAP_FAILED) {
+		perror("lcd device mmap() failed\n");
+	}
+	assert(s_FrameBuffer != MAP_FAILED);
 }
 
 int LCD_Ioctl(int fd, unsigned int request, void *arg)
@@ -91,12 +105,15 @@ void GUI_Init(void)
 	s_Y						= 0;
 	LCD_Ioctl(s_LcdFd, ST7735IOC_INIT, NULL);
 	LCD_Ioctl(s_LcdFd, ST7735IOC_LCD_INFO, &t_lcdInfo);
+	LCD_Mmap();
 	GUI_SetColor(GUI_BLACK);
 	GUI_SetBkColor(GUI_WHITE);
 #if (DEBUG > 0)
 	printf("width = %d\n", t_lcdInfo.m_width);
 	printf("height = %d\n", t_lcdInfo.m_height);
 #endif
+	GUI_AddFont(&t_font8x16);
+	GUI_SetFont(FONT_NAME_8X16);
 }
 
 //字符显示函数组
@@ -106,7 +123,17 @@ void GUI_DispChar(uint8 c)
 }
 void GUI_DispCharAt(uint8 c, uint32 x, uint32 y)
 {
+	struct string t_string;
+	uint8	array[2];
 
+	array[0]				= c;
+	array[1]				= 0;
+	t_string.m_x			= x;
+	t_string.m_y			= y;
+	t_string.m_data			= array;
+	t_string.m_len			= strlen(array);
+
+	LCD_Ioctl(s_LcdFd, ST7735IOC_SHOW_STRING, &t_string);
 }
 void GUI_DispString(const uint8 *s)
 {
@@ -114,7 +141,14 @@ void GUI_DispString(const uint8 *s)
 }
 void GUI_DispStringAt(const uint8 *s, uint32 x, uint32 y)
 {
+	struct string t_string;
 
+	t_string.m_x			= x;
+	t_string.m_y			= y;
+	t_string.m_data			= (uint8 *)s;
+	t_string.m_len			= strlen(s);
+
+	LCD_Ioctl(s_LcdFd, ST7735IOC_SHOW_STRING, &t_string);
 }
 
 //坐标函数组
@@ -281,11 +315,27 @@ void GUI_DrawArc(uint32 x, uint32 y, uint32 r, uint32 stangle, uint32 endangle)
 }
 
 //绘制bitmap图片
-void GUI_DrawBitmap(uint32 x, uint32 y)
+void GUI_DrawBitmap(const GUI_BITMAP *bitmap, uint32 x, uint32 y)
 {
+#define COLOR_CC(x)   ((x >> 8) | ((x&0xff) << 8))
+	uint16		i = 0, j = 0;
+	uint16		*ptr, *dest_ptr; 
+	struct pict  t_pict;
 
+	t_pict.m_x			= x;
+	t_pict.m_y			= y;
+	t_pict.m_x_size		= bitmap->x_size;
+	t_pict.m_y_size		= bitmap->y_size;
+	ptr					= (uint16 *)bitmap->data;
+	dest_ptr			= (uint16 *)s_FrameBuffer;
+
+	for (j = 0; j < t_pict.m_y_size; ++j){
+		for (i = 0; i < t_pict.m_x_size; ++i){
+			*dest_ptr++ = COLOR_CC(ptr[j*t_pict.m_x_size+i]);
+		}
+	}
+	LCD_Ioctl(s_LcdFd, ST7735IOC_DRAW_BITMAP, &t_pict);
 }
-
 
 //显示开关函数组
 void GUI_DisplayOn(void)
@@ -297,13 +347,26 @@ void GUI_DisplayOff(void)
 	LCD_Ioctl(s_LcdFd, ST7735IOC_BACKLIGHT_OFF, NULL);
 }
 
-#if 0
 //字体函数组
-void GUI_SetFont(const struct GUI_FONT *pfont)
+void GUI_SetFont(const uint8 *name)
 {
-
+	LCD_Ioctl(s_LcdFd, ST7735IOC_SET_FONT, name);
 }
-#endif
+
+void GUI_AddFont(const GUI_FONT *font)
+{
+	uint16  size		      = font->size;
+	struct font_set *font_set = (struct font_set *)malloc(sizeof(struct font_set)
+									+ size);
+	if (font_set == NULL){
+		return;
+	}
+	memcpy(font_set, font, sizeof(GUI_FONT));
+	memcpy(font_set->data, font->data, font->size);
+	LCD_Ioctl(s_LcdFd, ST7735IOC_ADD_FONT, font_set);
+	free(font_set);
+	font_set				= NULL;
+}
 
 #define B_BITS 5
 #define G_BITS 6

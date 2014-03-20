@@ -261,6 +261,8 @@
 #define	XXXXXXXX	0xff
 
 
+#define FONT_NAME_8X16		"font8x16"
+
 extern struct font  t_font8x16;
 
 

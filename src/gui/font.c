@@ -3015,11 +3015,12 @@ const u8 acFont8x16[][16] = {
 };
 
 struct font  t_font8x16 = {
-	(u8 *)acFont8x16,
-//	(u8 *)asc2_1608,
+	FONT_NAME_8X16,
 	8,
 	16,
 	1,
+	sizeof(acFont8x16),
+	(u8 *)acFont8x16,
 };
 
 

@@ -1,5 +1,4 @@
 #include "lcd_check.h"
-#include "gui.h"
 #include <stdio.h>      /*标准输入输出定义*/
 #include <stdlib.h>
 #include <unistd.h>     /*Unix标准函数定义*/
@@ -33,13 +32,14 @@ int main(void){
 	GUI_DrawArc(130, 60, 20, 30, 90);
 	GUI_DrawEllipse(110, 130, 45, 90);
 	GUI_DispStringAt("hello st7735 ----jjjjjjjHgggggHHHHH--", 0, 0);
-	GUI_DispCharAt('A', 100, 100);
+	//GUI_DispStringAt("world will become better", 0, 80);
+	GUI_DispCharAt('A', 100, 60);
 	//GUI_DrawRec(0, 0, 40, 20);
 	GUI_DrawRect(80, 80, 40, 20);
 //	GUI_FillRect(80, 110, 40, 20);
 	//GUI_ClearRect(20, 80, 40, 120);
-	//GUI_DrawBitmap(10, 10, &bmApplicationIcon);
-	//GUI_DrawBitmap(160, 10, &bmApplicationIcon);
+	GUI_DrawBitmap(&bmApplicationIcon, 10, 10);
+	GUI_DrawBitmap(&bmApplicationIcon, 120, 50);
 	//GUI_DisplayOn();
 
 	while (1);

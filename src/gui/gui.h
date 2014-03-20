@@ -107,16 +107,16 @@ void GUI_DrawEllipse(uint32 x0, uint32 y0, uint32 x1, uint32 y1);
 void GUI_DrawArc(uint32 x, uint32 y, uint32 r, uint32 stangle, uint32 endangle);
 
 //绘制bitmap图片
-void GUI_DrawBitmap(uint32 x, uint32 y);
+void GUI_DrawBitmap(const GUI_BITMAP *bitmap, uint32 x, uint32 y);
 
 
 //显示开关函数组
 void GUI_DisplayOn(void);
 void GUI_DisplayOff(void);
 
-
 //字体函数组
-//void GUI_SetFont(const struct GUI_FONT *pfont);
+void GUI_SetFont(const uint8 *name);
+void GUI_AddFont(const GUI_FONT *font);
 
 
 
