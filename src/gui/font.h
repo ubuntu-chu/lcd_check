@@ -262,8 +262,10 @@
 
 
 #define FONT_NAME_8X16		"font8x16"
+#define FONT_NAME_4X6		"font4x6"
 
-extern struct font  t_font8x16;
+extern const struct font  t_font8x16;
+extern const struct font  t_font4x6;
 
 
 

@@ -113,6 +113,7 @@ void GUI_Init(void)
 	printf("height = %d\n", t_lcdInfo.m_height);
 #endif
 	GUI_AddFont(&t_font8x16);
+	GUI_AddFont(&t_font4x6);
 	GUI_SetFont(FONT_NAME_8X16);
 }
 
