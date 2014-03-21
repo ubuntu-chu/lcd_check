@@ -31,8 +31,8 @@ int main(void){
 	GUI_FillCircle(50, 50, 10);
 	GUI_DrawArc(130, 60, 20, 30, 90);
 	GUI_DrawEllipse(110, 130, 45, 90);
-	GUI_DispStringAt("hello st7735 ----jjjjjjjHgggggHHHHH--", 0, 0);
-	GUI_DispStringAt("world will become better", 0, 100);
+	GUI_DispStringAt((const uint8 *)"hello st7735 ----jjjjjjjHgggggHHHHH--", 0, 0);
+	GUI_DispStringAt((const uint8 *)"world will become better", 0, 100);
 	GUI_DispCharAt('A', 100, 60);
 	//GUI_DrawRec(0, 0, 40, 20);
 	GUI_DrawRect(80, 80, 40, 20);

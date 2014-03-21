@@ -114,7 +114,7 @@ void GUI_Init(void)
 #endif
 	GUI_AddFont(&t_font8x16);
 	GUI_AddFont(&t_font4x6);
-	GUI_SetFont(FONT_NAME_8X16);
+	GUI_SetFont((const uint8 *)FONT_NAME_8X16);
 }
 
 //字符显示函数组
@@ -132,7 +132,7 @@ void GUI_DispCharAt(uint8 c, uint32 x, uint32 y)
 	t_string.m_x			= x;
 	t_string.m_y			= y;
 	t_string.m_data			= array;
-	t_string.m_len			= strlen(array);
+	t_string.m_len			= strlen((const char *)array);
 
 	LCD_Ioctl(s_LcdFd, ST7735IOC_SHOW_STRING, &t_string);
 }
@@ -147,7 +147,7 @@ void GUI_DispStringAt(const uint8 *s, uint32 x, uint32 y)
 	t_string.m_x			= x;
 	t_string.m_y			= y;
 	t_string.m_data			= (uint8 *)s;
-	t_string.m_len			= strlen(s);
+	t_string.m_len			= strlen((const char *)s);
 
 	LCD_Ioctl(s_LcdFd, ST7735IOC_SHOW_STRING, &t_string);
 }
@@ -351,7 +351,7 @@ void GUI_DisplayOff(void)
 //字体函数组
 void GUI_SetFont(const uint8 *name)
 {
-	LCD_Ioctl(s_LcdFd, ST7735IOC_SET_FONT, name);
+	LCD_Ioctl(s_LcdFd, ST7735IOC_SET_FONT, (void *)name);
 }
 
 void GUI_AddFont(const GUI_FONT *font)
