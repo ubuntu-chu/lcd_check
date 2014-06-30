@@ -72,7 +72,7 @@ all: head $(TARGETMAIN)
 $(TARGETMAIN) :$(BUILDOBJS)
 	$(CC) $(subst $(SRCDIR),$(OBJECTDIR),$^) $(CPPFLAGS) $(CFLAGS) $(XLDFLAGS) -o $@ $(LDLIBS) 
 #	$(STRIP)  --strip-unneeded $(TARGETMAIN)
-	cp $(TARGETMAIN) /home/barnard/work/board_9G25/rootfs/home/bsp/
+	cp $(TARGETMAIN) /home/barnard/work/board_9G25/rootfs/root/project/bin
 
 head:
 	cp /home/barnard/work/board_9G25/linux-at91/drivers/spi/st7735/st7735.h  ./src/gui/
